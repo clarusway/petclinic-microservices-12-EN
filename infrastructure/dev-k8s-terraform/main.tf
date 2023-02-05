@@ -7,15 +7,15 @@ module "iam" {
 }
 
 variable "sec-gr-mutual" {
-  default = "petclinic-k8s-mutual-sec-group-andy"
+  default = "petclinic-k8s-mutual-sec-group-adu"
 }
 
 variable "sec-gr-k8s-master" {
-  default = "petclinic-k8s-master-sec-group-andy"
+  default = "petclinic-k8s-master-sec-group-adu"
 }
 
 variable "sec-gr-k8s-worker" {
-  default = "petclinic-k8s-worker-sec-group-andy"
+  default = "petclinic-k8s-worker-sec-group-adu"
 }
 
 data "aws_vpc" "name" {
@@ -65,7 +65,7 @@ resource "aws_security_group" "petclinic-kube-worker-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "kube-worker-secgroup"
+    Name = "kube-worker-secgroup-adu"
     "kubernetes.io/cluster/petclinicCluster" = "owned"
   }
 }
@@ -147,7 +147,7 @@ resource "aws_security_group" "petclinic-kube-master-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "kube-master-secgroup"
+    Name = "kube-master-secgroup-adu"
   }
 }
 
@@ -156,7 +156,7 @@ resource "aws_instance" "kube-master" {
     instance_type = "t3a.medium"
     iam_instance_profile = module.iam.master_profile_name
     vpc_security_group_ids = [aws_security_group.petclinic-kube-master-sg.id, aws_security_group.petclinic-mutual-sg.id]
-    key_name = "clarus"
+    key_name = "aduncan"
     subnet_id = "subnet-c41ba589"  # select own subnet_id of us-east-1a
     availability_zone = "us-east-1a"
     tags = {
@@ -174,7 +174,7 @@ resource "aws_instance" "worker-1" {
     instance_type = "t3a.medium"
         iam_instance_profile = module.iam.worker_profile_name
     vpc_security_group_ids = [aws_security_group.petclinic-kube-worker-sg.id, aws_security_group.petclinic-mutual-sg.id]
-    key_name = "clarus"
+    key_name = "aduncan"
     subnet_id = "subnet-c41ba589"  # select own subnet_id of us-east-1a
     availability_zone = "us-east-1a"
     tags = {
