@@ -1,10 +1,9 @@
 pipeline {
     agent any
     environment {
-       // PATH=sh(script:"echo $PATH:/usr/local/bin", returnStdout:true).trim()
         APP_NAME="petclinic"
         APP_REPO_NAME="clarusway-repo/petclinic-app-staging"
-        AWS_ACCOUNT_ID=sh(script:'export PATH="$PATH:/usr/local/bin" && aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
+        AWS_ACCOUNT_ID=sh(script:'aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
         AWS_REGION="us-east-1"
         ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         RANCHER_URL="https://david-test.clarusway.us"
@@ -12,7 +11,7 @@ pipeline {
         RANCHER_CONTEXT="c-f8z7h:p-dr6qg" 
        //First part of projectID
         CLUSTERID="c-f8z7h"
-        RANCHER_CREDS=credentials('rancher-petclinic-credentials-david')
+        RANCHER_CREDS=credentials('petclinic-rancher-credentials-david')
     }
     stages {
         stage('Package Application') {
