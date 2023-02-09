@@ -1,23 +1,24 @@
 pipeline {
     agent any
     environment {
+        PATH=sh(script:"echo $PATH:/usr/local/bin", returnStdout:true).trim()
         APP_NAME="petclinic"
         APP_REPO_NAME="clarusway-repo/petclinic-app-staging"
-        AWS_ACCOUNT_ID=sh(script:'aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
+        AWS_ACCOUNT_ID=sh(script:'export PATH="$PATH:/usr/local/bin" && aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
         AWS_REGION="us-east-1"
         ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         RANCHER_URL="https://david-test.clarusway.us"
         // Get the project-id from Rancher UI (projects/namespaces --> petclinic-cluster-staging namespace --> Edit yaml --> copy projectId )
-        RANCHER_CONTEXT="c-f8z7h:p-dr6qg" 
+        RANCHER_CONTEXT="c-q85bl:p-tjzdz" 
        //First part of projectID
-        CLUSTERID="c-f8z7h"
+        CLUSTERID="c-q85bl"
         RANCHER_CREDS=credentials('petclinic-rancher-credentials-david')
     }
     stages {
         stage('Package Application') {
             steps {
                 echo 'Packaging the app into jars with maven'
-                //sh ". ./jenkins/package-with-maven-container.sh"
+                // sh ". ./jenkins/package-with-maven-container.sh"
             }
         }
         stage('Prepare Tags for Staging Docker Images') {
@@ -73,7 +74,7 @@ pipeline {
                 sh "rm -f k8s/config"
                 sh "rancher cluster kf $CLUSTERID > k8s/config"
                 sh "chmod 400 k8s/config"
-                //sh "helm repo add stable-petclinic s3://petclinic-helm-charts-tr/stable/myapp/"
+                sh "helm repo add stable-petclinic s3://petclinic-helm-charts-aduncan/stable/myapp/"
                 sh "helm package k8s/petclinic_chart"
                 sh "helm s3 push --force petclinic_chart-${BUILD_NUMBER}.tgz stable-petclinic"
                 sh "helm repo update"
